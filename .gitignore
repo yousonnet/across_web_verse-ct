@@ -1,0 +1,7 @@
+__pycache__
+data
+.cache/
+*.log
+constants.py
+config.json
+main.py

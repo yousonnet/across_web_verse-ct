@@ -1,0 +1,4 @@
+httpx==0.26.0
+pyautogen==0.2.9
+python_twitter==3.5
+schedule==1.2.1
