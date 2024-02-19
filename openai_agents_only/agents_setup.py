@@ -1,11 +1,13 @@
-from autogen import AssistantAgent, UserProxyAgent, ConversableAgent, GroupChat, GroupChatManager, config_list_from_json
-from constants import openai_api_key
+from autogen import AssistantAgent, UserProxyAgent, ConversableAgent, GroupChat, GroupChatManager, config_list_from_json, config_list_openai_aoai
 
-config_list = config_list_from_json(env_or_file="config.json")
+
+config_list_3dot5_turbo = config_list_from_json(env_or_file="OAI_CONFIG_LIST", filter_dict={
+    "model": ["gpt-3.5-turbo-0125"]
+})
 
 assistant = AssistantAgent(name="Assistant",     llm_config={
     # "seed": 42,  # seed for caching and reproducibility
-    "config_list": config_list,  # a list of OpenAI API configurations
+    "config_list": config_list_3dot5_turbo,  # a list of OpenAI API configurations
     # "temperature": 0,  # temperature for sampling
     # "request_timeout": 120,  # timeout
 },
@@ -15,7 +17,7 @@ assistant = AssistantAgent(name="Assistant",     llm_config={
 
 user_proxy_agent = UserProxyAgent(name="proxy_agent", llm_config={
     # "seed": 42,  # seed for caching and reproducibility
-    "config_list": config_list,  # a list of OpenAI API configurations
+    "config_list": config_list_3dot5_turbo,  # a list of OpenAI API configurations
     # "temperature": 0,  # temperature for sampling
     # "request_timeout": 120,  # timeout
 
@@ -25,7 +27,7 @@ user_proxy_agent = UserProxyAgent(name="proxy_agent", llm_config={
 groupchat = GroupChat(agents=[assistant, user_proxy_agent], messages=[])
 manager = GroupChatManager(groupchat=groupchat, name="manager", llm_config={
     # "seed": 42,  # seed for caching and reproducibility
-    "config_list": config_list,  # a list of OpenAI API configurations
+    "config_list": config_list_3dot5_turbo,  # a list of OpenAI API configurations
     # "temperature": 0,  # temperature for sampling
     # "request_timeout": 120,  # timeout
     # "model": "gpt-3.5-turbo"  # model to use
