@@ -3,6 +3,7 @@ data
 .cache/
 *.log
 constants.py
-config.json
 main.py
 OAI_CONFIG_LIST
+.env
+*.json
