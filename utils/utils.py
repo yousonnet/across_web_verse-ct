@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+import pandas as pd
 
 
 def timestr_to_time(time_str: str):
@@ -16,3 +17,10 @@ def is_termination_msg(x: dict):
     if (x.get("content", "").rstrip().endswith("TERMINATE")):
         return True
     return False
+
+
+# def add_new_line_to_csv(csv_file_path: str, data: dict):
+#     dataframe = pd.read_csv(csv_file_path)
+#     new_row_df = pd.DataFrame([data])
+#     df = dataframe.append(new_row_df, ignore_index=True)
+#     df.to_csv(csv_file_path, index=False)

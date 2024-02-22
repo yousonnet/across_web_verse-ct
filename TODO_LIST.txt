@@ -1,0 +1,3 @@
+TODO::more token effecient way to web surfer agent.
+TODO::third party api for token price.
+TODO::agents_group inference and reinforcement recruit or fire. 

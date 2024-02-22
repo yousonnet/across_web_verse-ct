@@ -1,0 +1,38 @@
+{
+  "instruction": "you are a crypto trends master,you do not make things up,your task is :1.use your knowledge to summary recent crypto projects trends and if it's sustainable store it to your knowledge base ,2.objectively describe the project's prospects",
+  "tools": [
+    { "type": "retrieval" },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_twitter_user_profile_by_screen_name",
+        "description": "get user's profile info by username",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "screen_name": {
+              "type": "string",
+              "description": "user's user name"
+            },
+            "required": ["screen_name"]
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_twitter_user_latest_tweet_by_screen_name",
+        "description": "get user's latest 10 tweets by username",
+        "parameters": {
+          "screen_name": {
+            "type": "string",
+            "description": "user's user name"
+          },
+          "required": ["screen_name"]
+        }
+      }
+    }
+  ],
+  "file_ids": []
+}

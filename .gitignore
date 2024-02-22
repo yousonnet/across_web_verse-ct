@@ -6,4 +6,4 @@ constants.py
 main.py
 OAI_CONFIG_LIST
 .env
-*.json
+*.csv

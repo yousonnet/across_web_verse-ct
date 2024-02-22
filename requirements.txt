@@ -1,4 +1,10 @@
-httpx==0.26.0
-pyautogen==0.2.9
+autogen==1.0.16
+click==8.1.7
+glom==23.5.0
+httpx==0.27.0
+numpy==1.26.4
+pandas==2.2.0
+pyautogen==0.2.14
+python-dotenv==1.0.1
 python_twitter==3.5
 schedule==1.2.1
