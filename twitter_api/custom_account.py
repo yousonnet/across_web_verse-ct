@@ -4,8 +4,8 @@ from typing import List, Dict
 
 
 class CustomAccount (Account):
-    def __init__(self, cookies, session):
-        super().__init__(cookies=cookies, session=session)
+    def __init__(self, cookies, session, **kwargs):
+        super().__init__(cookies=cookies, session=session, **kwargs)
 
     def get_user_id_by_screen_name(self, screen_name: str) -> int:
         res = self.v1('users/lookup.json', {'screen_name': screen_name})

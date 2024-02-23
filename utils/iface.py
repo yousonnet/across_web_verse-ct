@@ -1,16 +1,29 @@
 from typing import Dict, List, Tuple, Type, Union, TypedDict
 
-# twit_cookie_iface = {
-#     "auth_token": str,
-#     "ct0": str,
-#     "proxy_endpoint": str
-# }
-
 
 class TwitCookieIface(TypedDict):
     auth_token: str
     ct0: str
     proxy_endpoint: str
+
+
+class ReplyIFace(TypedDict):
+    created_at: str
+    conversation_id_str: str
+    favorite_count: int
+    # favorited:bool
+    full_text: str
+    in_reply_to_screen_name: str
+    in_reply_to_status_id_str: str
+    in_reply_to_user_id_str: str
+    is_quote_status: bool
+    lang: str
+    quote_count: int
+    reply_count: int
+    retweet_count: int
+    retweeted: bool
+    user_id_str: str
+    id_str: str
 
 
 class UserIFace(TypedDict):
