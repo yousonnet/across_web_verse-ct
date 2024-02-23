@@ -47,4 +47,4 @@ web_searcher_group = GroupChat(agents=[
 manager = GroupChatManager(groupchat=web_searcher_group, name="manager", system_message="you are a tough group manager,you only accept perfect research report ,when you receive that reply only TERMINATE to end chat,and you give the best advices to searchers", llm_config={
                            "config_list": config_list_3dot5_turbo, **remakeable_config})
 user_proxy.initiate_chat(
-    manager, message="collect the concept and design mechanism of this project,link:https://www.berachain.com/,if there are any new related links,please also collect the information from them,thanks!")
+    manager, message="collect the concept and design mechanism of this project,link:https://www.berachain.com/,if there are any new related links,please also collect the information from them")

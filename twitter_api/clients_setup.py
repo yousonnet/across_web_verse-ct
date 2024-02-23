@@ -25,11 +25,12 @@ class MyCustomError(Exception):
 twitter_account_error = MyCustomError("Twitter account error")
 
 
-def setupMultiClients(auth_token: str, ct0: str, proxy_url: str):
-    proxies = {
-        "http://": proxy_url,
-        "https://": proxy_url,
-    }
+def setupMultiClients(auth_token: str, ct0: str, proxy_url: str) -> ClientDict:
+    proxies = proxy_url
+    # {
+    #     "http://": proxy_url,
+    #     "https://": proxy_url,
+    # }
     account = CustomAccount(cookies={"ct0": ct0,
                                      "auth_token": auth_token}, session=httpx.Client(proxies=proxies))
     search = Search(cookies={"ct0": ct0,
@@ -48,6 +49,7 @@ def retry_on_exception(max_retries=3):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             retries = 0
+            init_exception = None
             while retries < max_retries:
                 try:
                     return func(*args, **kwargs)
@@ -55,8 +57,10 @@ def retry_on_exception(max_retries=3):
                     print(f"Error occurred: {e}, retrying... {
                           retries+1}/{max_retries}")
                     retries += 1
+                    init_exception = e
             # 超过最大重试次数后，重新抛出最后一次的异常
-            raise e
+            if init_exception is not None:
+                raise init_exception
         return wrapper
     return decorator
 
@@ -168,16 +172,16 @@ class ClientsGroup:
 # [{'data': {'user': {'result': {'__typename': 'User', 'id': 'VXNlcjo4NTA1NTMxOTc5MjM5MzQyMDk=', 'rest_id': '850553197923934209', 'affiliates_highlighted_label': {}, 'has_graduated_access': True, 'is_blue_verified': False, 'profile_image_shape': 'Circle', 'legacy': {'can_dm': False, 'can_media_tag': False, 'created_at': 'Sat Apr 08 03:37:39 +0000 2017', 'default_profile': True, 'default_profile_image': False, 'description': 'parasiempre', 'entities': {'description': {'urls': []}}, 'fast_followers_count': 0, 'favourites_count': 9614, 'followers_count': 389, 'friends_count': 3434, 'has_custom_timelines': True, 'is_translator': False, 'listed_count': 12, 'location': '', 'media_count': 86, 'name': 'yousonnet', 'normal_followers_count': 389, 'pinned_tweet_ids_str': ['1561584126037471232'], 'possibly_sensitive': False, 'profile_banner_url': 'https://pbs.twimg.com/profile_banners/850553197923934209/1670644584', 'profile_image_url_https': 'https://pbs.twimg.com/profile_images/1479474573846663170/I7ZeyR5h_normal.jpg', 'profile_interstitial_type': '', 'screen_name': 'yousonnet', 'statuses_count': 1640, 'translator_type': 'none', 'verified': False, 'want_retweets': False, 'withheld_in_countries': []}, 'smart_blocked_by': False, 'smart_blocking': False, 'legacy_extended_profile': {}, 'is_profile_translatable': False, 'verification_info': {}, 'business_account': {}}}}}]
 
     @retry_on_exception(max_retries=10)
-    def get_account_followers(self, screen_name: List[str]):
+    def get_account_followers(self, user_ids: List[int]):
         random_index = random.randint(0, len(self.accounts_group)-1)
-        res = self.scraper_group[random_index].followers(screen_name)
+        res = self.scraper_group[random_index].followers(user_ids)
         if (res[0].get('errors')):
             logger.info(f"{random_index} :twitter account invalid")
             raise twitter_account_error
         return res[0]
 
     @retry_on_exception(max_retries=10)
-    def get_account_following(self, user_ids: List[str]):
+    def get_account_following(self, user_ids: List[int]):
         random_index = random.randint(0, len(self.accounts_group)-1)
         res = self.scraper_group[random_index].following(user_ids)
         if (res[0].get('errors')):
@@ -187,18 +191,18 @@ class ClientsGroup:
     # [0]
 
     @retry_on_exception(max_retries=10)
-    def get_account_likes(self, screen_name: List[str]):
+    def get_account_likes(self, user_ids: List[int]):
         random_index = random.randint(0, len(self.accounts_group)-1)
-        res = self.scraper_group[random_index].likes(screen_name)
+        res = self.scraper_group[random_index].likes(user_ids)
         if (res[0].get('errors')):
             logger.info(f"{random_index} :twitter account invalid")
             raise twitter_account_error
         return res[0]
 
     # @retry_on_exception(max_retries=10)
-    def get_account_tweets_and_replies(self, screen_name: List[str]):
+    def get_account_tweets_and_replies(self, user_ids: List[int]):
         random_index = random.randint(0, len(self.accounts_group)-1)
-        res = self.scraper_group[random_index].tweets_and_replies(screen_name)
+        res = self.scraper_group[random_index].tweets_and_replies(user_ids)
         # if (res[0].get('errors')):
         #     logger.info(f"{random_index} :twitter account invalid")
         #     raise twitter_account_error
@@ -206,9 +210,9 @@ class ClientsGroup:
         return res
 
     @retry_on_exception(max_retries=10)
-    def get_account_media(self, screen_name: List[str]):
+    def get_account_media(self, user_ids: List[int]):
         random_index = random.randint(0, len(self.accounts_group)-1)
-        res = self.scraper_group[random_index].media(screen_name)
+        res = self.scraper_group[random_index].media(user_ids)
         if (res[0].get('errors')):
             logger.info(f"{random_index} :twitter account invalid")
             raise twitter_account_error
@@ -234,7 +238,7 @@ class ClientsGroup:
         return res
 
     @retry_on_exception(max_retries=10)
-    def get_tweets_details(self, tweets_ids: List[str]):
+    def get_tweets_details(self, tweets_ids: List[int]):
         random_index = random.randint(0, len(self.accounts_group)-1)
         res = self.scraper_group[random_index].tweets_details(tweets_ids)
         if (res[0].get('errors')):

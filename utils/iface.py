@@ -1,10 +1,16 @@
-from typing import Dict, List, Tuple, Union, TypedDict
+from typing import Dict, List, Tuple, Type, Union, TypedDict
 
-twit_cookie_iface = {
-    "auth_token": str,
-    "ct0": str,
-    "proxy_endpoint": str
-}
+# twit_cookie_iface = {
+#     "auth_token": str,
+#     "ct0": str,
+#     "proxy_endpoint": str
+# }
+
+
+class TwitCookieIface(TypedDict):
+    auth_token: str
+    ct0: str
+    proxy_endpoint: str
 
 
 class UserIFace(TypedDict):
