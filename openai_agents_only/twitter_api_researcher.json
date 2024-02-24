@@ -12,7 +12,109 @@
           "properties": {
             "screen_name": {
               "type": "string",
-              "description": "user's user name"
+              "description": "user's username"
+            },
+            "required": ["screen_name"]
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_twitter_user_latest_5_tweet",
+        "description": "get user's latest 5 tweets by username",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "screen_name": {
+              "type": "string",
+              "description": "user's username"
+            },
+            "required": ["screen_name"]
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_twitter_user_earliest_5_tweet",
+        "description": "get user's earliest 5 tweets by username",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "screen_name": {
+              "type": "string",
+              "description": "user's username"
+            },
+            "required": ["screen_name"]
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_twitter_user_latest_5_likes",
+        "description": "get user's latest 5 likes tweets by username",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "screen_name": {
+              "type": "string",
+              "description": "user's username"
+            },
+            "required": ["screen_name"]
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_twitter_user_earliest_5_likes",
+        "description": "get user's earliest 5 likes tweets by username",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "screen_name": {
+              "type": "string",
+              "description": "user's username"
+            },
+            "required": ["screen_name"]
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_twitter_user_earliest_5_replies",
+        "description": "get user's earliest 5 replies by username",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "screen_name": {
+              "type": "string",
+              "description": "user's username"
+            },
+            "required": ["screen_name"]
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_twitter_user_latest5_replies",
+        "description": "get user's latest 5 replies by username",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "screen_name": {
+              "type": "string",
+              "description": "user's username"
             },
             "required": ["screen_name"]
           }
@@ -25,6 +127,7 @@
     "project_name": "str",
     "twitter_followers": "int64",
     "description": "str",
+    "engineer_ablitiy": "float64",
     "track": "str",
     "rate": "float64"
   }

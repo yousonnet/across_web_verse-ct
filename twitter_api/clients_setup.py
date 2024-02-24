@@ -250,14 +250,15 @@ class ClientsGroup:
     @retry_on_exception(max_retries=10)
     def get_account_tweets_and_replies(self, user_ids: List[int]):
         random_index = random.randint(0, len(self.accounts_group)-1)
-        res = self.scraper_group[random_index].tweets_and_replies(user_ids)
+        res = self.scraper_group[random_index].tweets_and_replies(
+            user_ids, limit=10)
         print(res)
-        if (res[0].get('errors')):
-            logger.info(f"{random_index} :twitter account invalid")
-            raise twitter_account_error
-        res = self.find_legacy(res, [], 'legacy')
-        res = save_textable_dict(res)
-        res = map_from_raw_to_tweet_iface(res)
+        # if (res[0].get('errors')):
+        #     logger.info(f"{random_index} :twitter account invalid")
+        #     raise twitter_account_error
+        # res = self.find_legacy(res, [], 'legacy')
+        # res = save_textable_dict(res)
+        # res = map_from_raw_to_tweet_iface(res)
         return res
 
     # @retry_on_exception(max_retries=10)
@@ -299,7 +300,9 @@ class ClientsGroup:
 
 
 clients_group = ClientsGroup(clients=clients)
-res = clients_group.get_user_id('yousonnet')
+res = clients_group.get_user_id('trustzprocess')
 # print(res)
-res1 = clients_group.get_account_metadata([res])
-print(res1)
+res1 = clients_group.get_account_tweets_and_replies([res])
+# for i in res1:
+#     print(i)
+#     print('\n')
