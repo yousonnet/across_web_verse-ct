@@ -3,18 +3,22 @@ from twitter_api.custom_account import CustomAccount
 from twitter.scraper import Scraper
 from twitter.search import Search
 from twitter_api.constants import twits_cookies
-from typing import List, Dict, TypedDict
+from typing import List, Dict, TypedDict, Union
 import random
 import functools
 from custom_logger import logger
 from utils.iface import UserIFace, TweetWithoutMediaIFace, ReplyIFace
-from time import sleep
 
 
 class ClientDict(TypedDict):
     account: CustomAccount
     search: Search
     scraper: Scraper
+
+
+class RepliesAndTweets(TypedDict):
+    replies: List[ReplyIFace]
+    tweets: List[TweetWithoutMediaIFace]
 
 
 class MyCustomError(Exception):
@@ -63,6 +67,15 @@ def retry_on_exception(max_retries=3):
         return wrapper
     return decorator
 
+# def map_from_raw_to_reply_iface_bydict(data: Dict) -> ReplyIFace:
+#     reply_iface_instance: ReplyIFace = {key: data[key] for key in ReplyIFace.__annotations__.keys() if key in data }
+#     return reply_iface_instance
+
+# def to_typed_dict(data: dict, typed_dict_type: type) -> TypedDict:
+#     typed_dict = {key: data[key] for key in typed_dict_type.__annotations__.keys() if key in data}
+#     return typed_dict
+# 注意：这里没有类型检查或转换
+
 
 def map_from_raw_to_user_iface(array: List[Dict]) -> List[UserIFace]:
     return_list = []
@@ -85,10 +98,10 @@ def map_from_raw_to_tweet_iface(array: List[Dict]) -> List[TweetWithoutMediaIFac
     return_list = []
     for data in array:
 
-        mapped_data = {"retweeted_status_result": True if data.get(
-            "retweeted_status_result", False) else False}
-        mapped_data["quoted_status_id_str"] = data.get(
-            "quoted_status_id_str", None)
+        mapped_data = {"quoted_status_id_str": data.get(
+            "quoted_status_id_str", "")}
+        mapped_data["retweeted_status_result"] = data.get(
+            "retweeted_status_result", False)
         ad_mark = True
         for key in TweetWithoutMediaIFace.__annotations__.keys():
             if key == "quoted_status_id_str":
@@ -136,6 +149,8 @@ def save_user_dict(array: List[Dict]) -> List[Dict]:
 
 def save_reply_dict(array: List[Dict]) -> List[Dict]:
     return list(filter(lambda x: is_reply_dict(x), array))
+
+# def sort_viewable_tweet_chain(tweet_array:List[TweetWithoutMediaIFace],replies_array:List[ReplyIFace],main_user_id:int):
 
 
 class ClientsGroup:
@@ -248,18 +263,22 @@ class ClientsGroup:
         return res
 
     @retry_on_exception(max_retries=10)
-    def get_account_tweets_and_replies(self, user_ids: List[int]):
+    def get_account_tweets_and_replies(self, user_ids: List[int]) -> List[Union[ReplyIFace, TweetWithoutMediaIFace]]:
         random_index = random.randint(0, len(self.accounts_group)-1)
         res = self.scraper_group[random_index].tweets_and_replies(
-            user_ids, limit=10)
-        print(res)
-        # if (res[0].get('errors')):
-        #     logger.info(f"{random_index} :twitter account invalid")
-        #     raise twitter_account_error
-        # res = self.find_legacy(res, [], 'legacy')
-        # res = save_textable_dict(res)
-        # res = map_from_raw_to_tweet_iface(res)
-        return res
+            user_ids, limit=50)
+        if (res[0].get('errors')):
+            logger.info(f"{random_index} :twitter account invalid")
+            raise twitter_account_error
+        res = self.find_legacy(res, [], 'legacy')
+        res = save_textable_dict(res)
+        return_array: List[Union[ReplyIFace, TweetWithoutMediaIFace]] = []
+        for item in res:
+            if (item.get('in_reply_to_user_id_str') != None):
+                return_array.append(map_from_raw_to_tweet_iface([item])[0])
+            else:
+                return_array.append(map_from_raw_to_reply_iface([item])[0])
+        return return_array
 
     # @retry_on_exception(max_retries=10)
     # def get_account_media(self, user_ids: List[int]):
@@ -300,9 +319,8 @@ class ClientsGroup:
 
 
 clients_group = ClientsGroup(clients=clients)
-res = clients_group.get_user_id('trustzprocess')
+res = clients_group.get_user_id('yousonnet')
 # print(res)
 res1 = clients_group.get_account_tweets_and_replies([res])
-# for i in res1:
-#     print(i)
-#     print('\n')
+for i in res1:
+    print(i)

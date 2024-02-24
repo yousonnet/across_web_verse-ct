@@ -74,5 +74,5 @@ class TweetWithoutMediaIFace(TypedDict):
     retweet_count: int
     user_id_str: str
     id_str: str
-    quoted_status_id_str: str | None
+    quoted_status_id_str: str
     retweeted_status_result: bool
