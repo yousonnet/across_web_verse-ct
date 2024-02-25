@@ -1,4 +1,8 @@
-from typing import Dict, List, Tuple, Type, Union, TypedDict
+from __future__ import annotations
+from typing import Dict, List, Tuple, Type, Union, TypedDict, Literal
+
+TweetTypes = Union[Literal['repost'], Literal['quote'],
+                   Literal['tweet'], Literal['reply']]
 
 
 class TwitCookieIface(TypedDict):
@@ -75,4 +79,13 @@ class TweetWithoutMediaIFace(TypedDict):
     user_id_str: str
     id_str: str
     quoted_status_id_str: str
-    retweeted_status_result: bool
+    # retweeted_status_result: bool
+
+
+class TweetGeneralMessageIFace(TypedDict):
+    created_at: str
+    full_text: str
+    id_str: str
+    replies: List[TweetGeneralMessageIFace]
+    types: TweetTypes
+    is_found_upstream_source: bool

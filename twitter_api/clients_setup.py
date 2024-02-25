@@ -8,6 +8,7 @@ import random
 import functools
 from custom_logger import logger
 from utils.iface import UserIFace, TweetWithoutMediaIFace, ReplyIFace
+from twitter_api.tweets_utils import map_from_raw_to_user_iface, map_from_raw_to_reply_iface, map_from_raw_to_tweet_iface, is_reply_dict, save_user_dict, save_textable_dict, save_reply_dict
 
 
 class ClientDict(TypedDict):
@@ -58,8 +59,8 @@ def retry_on_exception(max_retries=3):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
-                    print(f"Error occurred: {e}, retrying... {
-                          retries+1}/{max_retries}")
+                    print(
+                        "Error occurred: {}, retrying... {}/{}".format(e, retries+1, max_retries))
                     retries += 1
                     init_exception = e
             if init_exception is not None:
@@ -76,79 +77,6 @@ def retry_on_exception(max_retries=3):
 #     return typed_dict
 # 注意：这里没有类型检查或转换
 
-
-def map_from_raw_to_user_iface(array: List[Dict]) -> List[UserIFace]:
-    return_list = []
-    for data in array:
-        return_list.append(
-            {key: data[key] for key in UserIFace.__annotations__.keys() if key in data})
-    return return_list
-
-
-def map_from_raw_to_reply_iface(array: List[Dict]) -> List[ReplyIFace]:
-    return_list = []
-
-    for data in array:
-        return_list.append(
-            {key: data[key] for key in ReplyIFace.__annotations__.keys() if key in data})
-    return return_list
-
-
-def map_from_raw_to_tweet_iface(array: List[Dict]) -> List[TweetWithoutMediaIFace]:
-    return_list = []
-    for data in array:
-
-        mapped_data = {"quoted_status_id_str": data.get(
-            "quoted_status_id_str", "")}
-        mapped_data["retweeted_status_result"] = data.get(
-            "retweeted_status_result", False)
-        ad_mark = True
-        for key in TweetWithoutMediaIFace.__annotations__.keys():
-            if key == "quoted_status_id_str":
-                continue
-            elif key == "retweeted_status_result":
-                continue
-            # 将数据格式转化一下
-            elif key in data:
-                mapped_data[key] = data[key]
-                ad_mark = False
-        if (not ad_mark):
-            return_list.append(mapped_data)
-    return return_list
-
-
-def is_user_dict(dict: Dict) -> bool:
-    if (dict.get('can_dm') != None):
-        return True
-    else:
-        return False
-
-
-def is_text_dict(dict: Dict) -> bool:
-    if (dict.get('full_text') != None):
-        return True
-    else:
-        return False
-# 包含reply和tweet
-
-
-def is_reply_dict(dict: Dict) -> bool:
-    if (dict.get('in_reply_to_user_id_str') != None):
-        return True
-    else:
-        return False
-
-
-def save_textable_dict(array: List[Dict]) -> List[Dict]:
-    return list(filter(lambda x:  is_text_dict(x), array))
-
-
-def save_user_dict(array: List[Dict]) -> List[Dict]:
-    return list(filter(lambda x: is_user_dict(x), array))
-
-
-def save_reply_dict(array: List[Dict]) -> List[Dict]:
-    return list(filter(lambda x: is_reply_dict(x), array))
 
 # def sort_viewable_tweet_chain(tweet_array:List[TweetWithoutMediaIFace],replies_array:List[ReplyIFace],main_user_id:int):
 
@@ -274,10 +202,10 @@ class ClientsGroup:
         res = save_textable_dict(res)
         return_array: List[Union[ReplyIFace, TweetWithoutMediaIFace]] = []
         for item in res:
-            if (item.get('in_reply_to_user_id_str') != None):
-                return_array.append(map_from_raw_to_tweet_iface([item])[0])
-            else:
+            if (is_reply_dict(item)):
                 return_array.append(map_from_raw_to_reply_iface([item])[0])
+            else:
+                return_array.append(map_from_raw_to_tweet_iface([item])[0])
         return return_array
 
     # @retry_on_exception(max_retries=10)
