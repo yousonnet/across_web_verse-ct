@@ -85,7 +85,20 @@ class TweetWithoutMediaIFace(TypedDict):
 class TweetGeneralMessageIFace(TypedDict):
     created_at: str
     full_text: str
-    id_str: str
+    # user_id_str: str
+    screen_name: str
     replies: List[TweetGeneralMessageIFace]
     types: TweetTypes
     is_found_upstream_source: bool
+
+
+# class ReConstructureTweetGeneralMessage():
+#     def __init__(self, data: Union[TweetWithoutMediaIFace, ReplyIFace],parent:Union[None,ReConstructureTweetGeneralMessage]=None):
+#         self.created_at = data['created_at']
+#         self.full_text = data['full_text']
+#         self.id_str = data['id_str']
+#         self.replies: List[TweetGeneralMessageIFace] = []  # 确保 replies 是正确的类型
+#         self.types = {'type': 'tweet'}  # 假设这是 TweetTypes 的有效值
+#         self.is_found_upstream_source = True
+#         self.parent = parent
+#     def cross_tweet_pointer():

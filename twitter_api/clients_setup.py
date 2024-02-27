@@ -8,7 +8,8 @@ import random
 import functools
 from custom_logger import logger
 from utils.iface import UserIFace, TweetWithoutMediaIFace, ReplyIFace
-from twitter_api.tweets_utils import map_from_raw_to_user_iface, map_from_raw_to_reply_iface, map_from_raw_to_tweet_iface, is_reply_dict, save_user_dict, save_textable_dict, save_reply_dict
+from twitter_api.tweets_utils import is_user_dict, map_from_raw_to_user_iface, map_from_raw_to_reply_iface, map_from_raw_to_tweet_iface, is_reply_dict, save_user_dict, save_textable_dict, save_reply_dict, save_useable_dict
+from twitter_api.tweet_text_chain import replace_user_id_to_screen_name, tweet_inference
 
 
 class ClientDict(TypedDict):
@@ -179,9 +180,9 @@ class ClientsGroup:
         return res
 
     @retry_on_exception(max_retries=10)
-    def get_account_likes(self, user_ids: List[int]):
+    def get_account_likes(self, user_ids: List[int], limit=100):
         random_index = random.randint(0, len(self.accounts_group)-1)
-        res = self.scraper_group[random_index].likes(user_ids)
+        res = self.scraper_group[random_index].likes(user_ids, limit=limit)
         if (res[0].get('errors')):
             logger.info(f"{random_index} :twitter account invalid")
             raise twitter_account_error
@@ -191,19 +192,22 @@ class ClientsGroup:
         return res
 
     @retry_on_exception(max_retries=10)
-    def get_account_tweets_and_replies(self, user_ids: List[int]) -> List[Union[ReplyIFace, TweetWithoutMediaIFace]]:
+    def get_account_tweets_and_replies(self, user_ids: List[int], limit=100):
         random_index = random.randint(0, len(self.accounts_group)-1)
         res = self.scraper_group[random_index].tweets_and_replies(
-            user_ids, limit=50)
+            user_ids, limit=limit)
         if (res[0].get('errors')):
             logger.info(f"{random_index} :twitter account invalid")
             raise twitter_account_error
         res = self.find_legacy(res, [], 'legacy')
         res = save_textable_dict(res)
-        return_array: List[Union[ReplyIFace, TweetWithoutMediaIFace]] = []
+        return_array: List[Union[ReplyIFace,
+                                 TweetWithoutMediaIFace]] = []
         for item in res:
             if (is_reply_dict(item)):
                 return_array.append(map_from_raw_to_reply_iface([item])[0])
+            # elif (is_user_dict(item)):
+            #     return_array.append(map_from_raw_to_user_iface([item])[0])
             else:
                 return_array.append(map_from_raw_to_tweet_iface([item])[0])
         return return_array
@@ -218,10 +222,10 @@ class ClientsGroup:
     #     return res[0]
 
     @retry_on_exception(max_retries=10)
-    def get_account_tweets(self, user_ids: List[int]):
+    def get_account_tweets(self, user_ids: List[int], limit=100):
         """get posts from tab result"""
         random_index = random.randint(0, len(self.accounts_group)-1)
-        res = self.scraper_group[random_index].tweets(user_ids)
+        res = self.scraper_group[random_index].tweets(user_ids, limit=limit)
         # print(res)
         if (res[0].get('errors')):
             logger.info(f"{random_index} :twitter account invalid")
@@ -229,7 +233,6 @@ class ClientsGroup:
         res = self.find_legacy(res, [], 'legacy')
         res = save_textable_dict(res)
         res = map_from_raw_to_tweet_iface(res)
-
         return res
 
     @retry_on_exception(max_retries=10)
@@ -247,8 +250,9 @@ class ClientsGroup:
 
 
 clients_group = ClientsGroup(clients=clients)
-res = clients_group.get_user_id('yousonnet')
-# print(res)
+res = clients_group.get_user_id('tensor_hq')
+print(res)
 res1 = clients_group.get_account_tweets_and_replies([res])
-for i in res1:
-    print(i)
+res1 = tweet_inference(res1)
+res2 = replace_user_id_to_screen_name(res1, str(res), 'tensor_hq')
+print(res2)

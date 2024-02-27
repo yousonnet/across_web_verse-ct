@@ -43,14 +43,14 @@ def map_from_raw_to_tweet_iface(array: List[Dict]) -> List[TweetWithoutMediaIFac
 
 
 def is_user_dict(dict: Dict) -> bool:
-    if (dict.get('can_dm') != None):
+    if (dict.get('screen_name')):
         return True
     else:
         return False
 
 
 def is_text_dict(dict: Dict) -> bool:
-    if (dict.get('full_text') != None):
+    if (dict.get('full_text')):
         return True
     else:
         return False
@@ -58,10 +58,14 @@ def is_text_dict(dict: Dict) -> bool:
 
 
 def is_reply_dict(dict: Dict) -> bool:
-    if (dict.get('in_reply_to_status_id_str') != None):
+    if (dict.get('in_reply_to_status_id_str')):
         return True
     else:
         return False
+
+
+def save_useable_dict(array: List[Dict]) -> List[Dict]:
+    return list(filter(lambda x: is_user_dict(x) or is_text_dict(x) or is_reply_dict(x), array))
 
 
 def save_textable_dict(array: List[Dict]) -> List[Dict]:

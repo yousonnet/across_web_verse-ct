@@ -3,6 +3,15 @@ import json
 import pandas as pd
 
 
+def x_api_timestr_to_time(original_time_str: str) -> str:
+
+    datetime_obj = datetime.strptime(
+        original_time_str, '%a %b %d %H:%M:%S %z %Y')
+    simple_readable_time = datetime_obj.strftime('%Y-%m-%d %H:%M')
+
+    return simple_readable_time
+
+
 def timestr_to_time(time_str: str):
     time_obj = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S.%f%z')
     return time_obj

@@ -13,3 +13,5 @@
 8.once find main tweet ,inference step can be done.
 
 9.if reply chain exceeds 3,twitter will fold the middle message,so only conversation_id_str can be same,reply_id doesn't make sense
+
+10.may be from raw to text directly?
